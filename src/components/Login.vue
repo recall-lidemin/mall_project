@@ -1,15 +1,85 @@
 <template>
   <div class="login_container">
     <div class="login_box">
+      <!-- 头像区 -->
       <div class="avatar_box">
-        <img src="../assets/logo.png" alt="" />
+        <img src="../assets/logo.png" alt />
       </div>
+      <!-- 表单区域 -->
+      <el-form
+        ref="loginFormRef"
+        :rules="loginFormRules"
+        :model="loginForm"
+        label-width="0px"
+        class="login_form"
+      >
+        <!-- 用户名 -->
+        <el-form-item prop="username">
+          <el-input v-model="loginForm.username" prefix-icon="iconfont icon-user"></el-input>
+        </el-form-item>
+        <!-- 密码 -->
+        <el-form-item prop="password">
+          <el-input
+            type="password"
+            v-model="loginForm.password"
+            prefix-icon="iconfont icon-3702mima"
+          ></el-input>
+        </el-form-item>
+        <!-- 按钮 -->
+        <el-form-item class="btns">
+          <el-button @click="login" type="primary">登录</el-button>
+          <el-button @click="resetLoginForm" type="info">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      // 登录表单得数据绑定对象
+      loginForm: {
+        username: 'admin',
+        password: '123456'
+      },
+      // 表单验证规则对象
+      loginFormRules: {
+        // 验证用户名合法性
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        ],
+        // 验证密码
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 5, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    resetLoginForm() {
+      this.$refs.loginFormRef.resetFields()
+    },
+    login() {
+      this.$refs.loginFormRef.validate(async valid => {
+        if (!valid) return false
+        const { data: res } = await this.$http.post('login', this.loginForm)
+        if (res.meta.status !== 200) return this.$message.error('登录失败')
+        this.$message.success('登录成功')
+        // 1.将登录成功之后得token，保存到客户端sessionStorage
+        console.log(res)
+        //   1.1除了登录之外得接口，必须在登录之后才能访问
+        //   1.2token只应在当前网站打开期间生效，所以保存在sessionStorage中
+        window.sessionStorage.setItem('token', res.data.token)
+        // 2.通过编程式导航跳转到后台，路由地址是 /home
+        this.$router.push('/home')
+      })
+    }
+  }
+}
 </script>
 
 <style lang="less">
@@ -46,5 +116,18 @@ export default {}
       background-color: #eee;
     }
   }
+}
+
+.btns {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.login_form {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 20px;
 }
 </style>
