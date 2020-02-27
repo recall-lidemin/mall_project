@@ -101,6 +101,18 @@
 <script>
 export default {
   data() {
+    // 自定义验证邮箱规则
+    const checkEmail = (rule, value, callback) => {
+      const regEmail = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/
+      if (regEmail.test(value)) return callback()
+      callback(new Error('请输入正确的邮箱'))
+    }
+    // 自定义验证手机规则
+    const checkMobile = (rule, value, callback) => {
+      const regMobile = /^1([38][0-9]|4[579]|5[0-3,5-9]|6[6]|7[0135678]|9[89])\d{8}$/
+      if (regMobile.test(value)) return callback()
+      callback(new Error('请输入正确的手机号'))
+    }
     return {
       // 获取用户列表得参数数据
       queryInfo: {
@@ -140,8 +152,14 @@ export default {
             trigger: 'blur'
           }
         ],
-        email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
-        mobile: [{ required: true, message: '请输入手机', trigger: 'blur' }]
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
       }
     }
   },
