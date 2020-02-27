@@ -8,7 +8,7 @@ import './assets/fonts/iconfont.css'
 // 导入挂在axios
 import axios from 'axios'
 // 配置请求得根路径
-axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+axios.defaults.baseURL = 'http://www.lideminrecall.com/api/'
 // 请求拦截，为请求得headers添加Authorization属性
 axios.interceptors.request.use(config => {
   config.headers.Authorization = window.sessionStorage.getItem('token')

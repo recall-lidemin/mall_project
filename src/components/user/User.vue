@@ -23,13 +23,48 @@
 
       <!-- 用户列表区域 -->
       <el-table :data="userlist" style="width:100%" border stripe>
+        <el-table-column type="index"></el-table-column>
         <el-table-column prop="username" label="姓名"></el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column prop="mobile" label="电话"></el-table-column>
         <el-table-column prop="role_name" label="角色"></el-table-column>
-        <el-table-column prop="mg_state" label="状态"></el-table-column>
-        <el-table-column label="操作"></el-table-column>
+        <el-table-column label="状态">
+          <!-- 作用域插槽 -->
+          <template slot-scope="scope">
+            <!-- scope.row 获取当前行的数据 -->
+            <el-switch v-model="scope.row.msg_state"></el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="180px">
+          <template>
+            <!-- scope.row 获取当前行的数据 -->
+            <!-- 修改 -->
+            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <!-- 删除 -->
+            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-tooltip
+              :enterable="false"
+              class="item"
+              effect="dark"
+              content="分配角色"
+              placement="top"
+            >
+              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            </el-tooltip>
+          </template>
+        </el-table-column>
       </el-table>
+
+      <!-- 分页区 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum"
+        :page-sizes="[5,10, 20, 30, 40,50,100]"
+        :page-size="queryInfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
     </el-card>
   </div>
 </template>
@@ -41,8 +76,9 @@ export default {
       // 获取用户列表得参数数据
       queryInfo: {
         query: '',
+        // 当前页数
         pagenum: 1,
-        pagesize: 2
+        pagesize: 5
       },
       userlist: [],
       total: 0
@@ -61,6 +97,16 @@ export default {
       }
       this.userlist = res.data.users
       this.total = res.data.total
+    },
+    // 监听pageSize
+    handleSizeChange(newsize) {
+      this.queryInfo.pagesize = newsize
+      this.getUserList()
+    },
+    // 监听页码值变化
+    handleCurrentChange(newPage) {
+      this.queryInfo.pagenum = newPage
+      this.getUserList()
     }
   }
 }
