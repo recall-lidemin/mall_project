@@ -12,8 +12,13 @@
       <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input
+            clearable
+            @clear="getUserList"
+            placeholder="请输入内容"
+            v-model.trim="queryInfo.query"
+          >
+            <el-button @click="getUserList" slot="append" icon="el-icon-search"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
