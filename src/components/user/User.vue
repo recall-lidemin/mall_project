@@ -73,7 +73,7 @@
     </el-card>
 
     <!-- 添加用户对话框 -->
-    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%">
+    <el-dialog @close="addDialogClosed" title="添加用户" :visible.sync="addDialogVisible" width="50%">
       <!-- 内容主体 -->
       <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
         <el-form-item label="用户名" prop="username">
@@ -92,7 +92,7 @@
       <!-- 底部按钮区 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -167,6 +167,7 @@ export default {
     this.getUserList()
   },
   methods: {
+    // 获取用户列表
     async getUserList() {
       const { data: res } = await this.$http.get('users', {
         params: this.queryInfo
@@ -197,6 +198,20 @@ export default {
         return this.$message.error('更新用户状态失败')
       }
       this.$message.success('更新用户状态成功')
+    },
+    // 监听添加用户Dialog关闭
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields()
+    },
+    addUser() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return false
+        // 发起请求添加用户
+        const { data: res } = await this.$http.post('users', this.addForm)
+        if (res.meta.status !== 201) return this.$message.error('添加用户失败')
+        this.$message.success('添加用户成功')
+        this.addDialogVisible = false
+      })
     }
   }
 }
