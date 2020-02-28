@@ -51,7 +51,13 @@
               size="mini"
             ></el-button>
             <!-- 删除 -->
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button
+              @click="delUser(scope.row.id)"
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+            ></el-button>
+            <!-- 分配角色 -->
             <el-tooltip
               :enterable="false"
               class="item"
@@ -278,6 +284,27 @@ export default {
     editDialogClosed() {
       this.$refs.editFormRef.resetFields()
       this.editForm = {}
+    },
+    // 删除用户
+    delUser(id) {
+      this.$msgBox
+        .confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        .then(async () => {
+          const { data: res } = await this.$http.delete(`users/${id}`)
+          if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+          this.$message.success(res.meta.msg)
+          this.getUserList()
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     }
   }
 }
