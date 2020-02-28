@@ -44,7 +44,12 @@
           <template slot-scope="scope">
             <!-- scope.row 获取当前行的数据 -->
             <!-- 修改 -->
-            <el-button @click="editUser(scope.row)" type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button
+              @click="editUser(scope.row.id)"
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+            ></el-button>
             <!-- 删除 -->
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
             <el-tooltip
@@ -97,11 +102,16 @@
     </el-dialog>
 
     <!-- 编辑用户对话框  -->
-    <el-dialog title="修改用户信息" :visible.sync="editDialogVisible" width="50%">
+    <el-dialog
+      @close="editDialogClosed"
+      title="修改用户信息"
+      :visible.sync="editDialogVisible"
+      width="50%"
+    >
       <!-- 主体内容区 -->
       <el-form :model="editForm" :rules="addFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="editForm.username"></el-input>
+          <el-input v-model="editForm.username" disabled></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="editForm.email"></el-input>
@@ -240,9 +250,8 @@ export default {
       })
     },
     // 编辑用户（根据ID获取要编辑用户的信息）
-    async editUser(userinfo) {
-      console.log(userinfo)
-      const { data: res } = await this.$http.get(`users/${userinfo.id}`)
+    async editUser(id) {
+      const { data: res } = await this.$http.get(`users/${id}`)
       if (res.meta.status !== 200) {
         return this.$message.error('未取到对应用户信息')
       }
@@ -264,6 +273,11 @@ export default {
         this.editDialogVisible = false
         this.getUserList()
       })
+    },
+    // 监听编辑Dialog关闭
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+      this.editForm = {}
     }
   }
 }
