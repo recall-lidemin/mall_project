@@ -21,7 +21,7 @@
                     <el-row :class="['bdbottom','vcenter', i1 === 0 ? 'bdtop' : '']" v-for="(item1,i1) in scope.row.children" :key="item1.id">
                         <!-- 渲染一级权限 -->
                         <el-col :span="5">
-                            <el-tag> {{ item1.authName }} </el-tag>
+                            <el-tag @close="removeRightById(scope.row,item1.id)" closable> {{ item1.authName }} </el-tag>
                             <i class="el-icon-caret-right"></i>
                         </el-col>
                         <!-- 渲染二级和三级权限 -->
@@ -29,11 +29,12 @@
                             <!-- 渲染二级权限 -->
                             <el-row :class="['vcenter',i2 === 0 ? '' : 'bdtop']" v-for="(item2,i2) in item1.children" :key="item2.id">
                                 <el-col :span="6">
-                                    <el-tag type="success">{{ item2.authName }}</el-tag>
+                                    <el-tag @close="removeRightById(scope.row,item2.id)" closable type="success">{{ item2.authName }}</el-tag>
                                     <i class="el-icon-caret-right"></i>
                                 </el-col>
+                                <!-- 渲染三级权限 -->
                                 <el-col :span="18">
-                                    <el-tag type="warning" v-for="(item3) in item2.children" :key="item3.id">{{ item3.authName }}</el-tag>
+                                    <el-tag @close="removeRightById(scope.row,item3.id)" closable type="warning" v-for="(item3) in item2.children" :key="item3.id">{{ item3.authName }}</el-tag>
                                 </el-col>
                             </el-row>
                         </el-col>
@@ -74,6 +75,18 @@ export default {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) return this.$message.error('获取角色失败')
       this.rolesList = res.data
+    },
+    async removeRightById(role, id) {
+      const confirmResult = await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') return this.$message.info('取消了删除！')
+      const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${id}`)
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.$message.success(res.meta.msg)
+      role.children = res.data
     }
   }
 }

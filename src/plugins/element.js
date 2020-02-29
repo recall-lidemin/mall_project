@@ -27,4 +27,4 @@ Vue.use(Dialog)
 
 // 挂载弹框组件
 Vue.prototype.$message = Message
-Vue.prototype.$msgBox = MessageBox
+Vue.prototype.$confirm = MessageBox.confirm
