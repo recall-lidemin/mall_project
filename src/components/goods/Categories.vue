@@ -15,21 +15,17 @@
       </el-row>
 
       <!-- 商品分类区 -->
-      <el-table>
-        <el-table-column type="index"></el-table-column>
-        <el-table-column label="分类名称"></el-table-column>
-        <el-table-column label="是否有效"></el-table-column>
-        <el-table-column label="排序"></el-table-column>
-        <el-table-column label="操作"></el-table-column>
-      </el-table>
+      <tree-table border index-text='' show-index :expand-type="false" :selection-type="false" :data="cateList" :columns="columns">
+
+      </tree-table>
 
       <!-- 分页区域 -->
       <el-pagination
-        :current-page="1"
+        :current-page="queryInfo.pagenum"
         :page-sizes="[5,10, 20, 30, 40,50,100]"
-        :page-size="1"
+        :page-size="queryInfo.pagesize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="1"
+        :total="total"
       ></el-pagination>
     </el-card>
   </div>
@@ -38,14 +34,39 @@
 <script>
 export default {
   data() {
-    return {}
+    return {
+      cateList: [],
+      // 查询条件
+      queryInfo: {
+        type: 3,
+        pagenum: 1,
+        pagesize: 5
+      },
+      total: 0,
+      // 为table指定列的定义
+      columns: [
+        {
+          label: '分类名称',
+          prop: 'cat_name'
+        }
+      ]
+    }
   },
   created() {
-
+    this.getCateList()
   },
   methods: {
     addCate() {
 
+    },
+    // 获取商品分类数据
+    async getCateList() {
+      const { data: res } = await this.$http.get('categories', { params: this.queryInfo })
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      // 拿到数据列表
+      this.cateList = res.data.result
+      // 获取数据总条数
+      this.total = res.data.total
     }
   }
 }
