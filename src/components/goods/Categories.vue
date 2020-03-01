@@ -177,6 +177,7 @@ export default {
       const { data: res } = await this.$http.get('categories', { params: { type: 2 } })
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.parentCateList = res.data
+      console.log(this.parentCateList)
     },
     // 选择项发生变化触发这个函数
     parentCateChange() {
@@ -198,7 +199,9 @@ export default {
       this.addCateForm.cat_pid = 0
       this.addCateForm.cat_level = 0
     },
+    // 发起添加商品分类
     addCate() {
+      console.log(this.selectedKeys)
       this.$refs.addCateFormRef.validate(async valid => {
         if (!valid) return
         const { data: res } = await this.$http.post('categories', this.addCateForm)
