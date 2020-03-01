@@ -65,7 +65,7 @@
               content="分配角色"
               placement="top"
             >
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button @click="showAllotRoleDialog(scope.row)" type="warning" icon="el-icon-setting" size="mini"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -108,12 +108,7 @@
     </el-dialog>
 
     <!-- 编辑用户对话框  -->
-    <el-dialog
-      @close="editDialogClosed"
-      title="修改用户信息"
-      :visible.sync="editDialogVisible"
-      width="50%"
-    >
+    <el-dialog @close="editDialogClosed" title="修改用户信息" :visible.sync="editDialogVisible" width="50%">
       <!-- 主体内容区 -->
       <el-form :model="editForm" :rules="addFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名" prop="username">
@@ -130,6 +125,28 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveEditUser">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 添加分配角色对话框 -->
+    <el-dialog @close="allotRoleDialogClosed" title="分配角色" :visible.sync="allotRoleDialogVisible" width="50%">
+      <!-- 主体内容区 -->
+      <p>当前用户：{{ userinfo.username }}</p>
+      <p>当前角色：{{ userinfo.role_name }}</p>
+      <p>分配角色：
+        <el-select v-model="selectedRoleId" placeholder="请选择角色">
+          <el-option
+            v-for="item in rolesList"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </p>
+      <!-- 底部按钮区 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="allotRoleDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveAllotDialog">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -200,7 +217,15 @@ export default {
         ]
       },
       // 控制修改用户信息对话框的显示与隐藏
-      editDialogVisible: false
+      editDialogVisible: false,
+      // 控制分配角色对话框显示与隐藏
+      allotRoleDialogVisible: false,
+      // 需要分配角色的用户
+      userinfo: {},
+      // 所有角色列表
+      rolesList: [],
+      // 选中的角色id值
+      selectedRoleId: ''
     }
   },
   created() {
@@ -304,6 +329,29 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    // 显示分配角色对话框
+    async showAllotRoleDialog(info) {
+      this.userinfo = info
+      // 获取全部角色
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.rolesList = res.data
+      this.allotRoleDialogVisible = true
+    },
+    // 保存分配角色
+    async saveAllotDialog() {
+      if (!this.selectedRoleId) return this.$message.error('请选择用户角色')
+      const { data: res } = await this.$http.put(`users/${this.userinfo.id}/role`, { rid: this.selectedRoleId })
+      if (res.meta.status !== 200) return this.$message.error('更新用户角色失败')
+      this.$message.success('更新用户角色成功')
+      this.getUserList()
+      this.allotRoleDialogVisible = false
+    },
+    // 监听分配角色对话框关闭
+    allotRoleDialogClosed() {
+      this.selectedRoleId = ''
+      this.userinfo = {}
     }
   }
 }

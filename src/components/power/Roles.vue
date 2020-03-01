@@ -180,7 +180,6 @@ export default {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) return this.$message.error('获取角色失败')
       this.rolesList = res.data
-      console.log(this.rolesList)
     },
     // 实现展开栏下删除权限
     async removeRightById(role, id) {
@@ -263,8 +262,6 @@ export default {
     async saveEditRoles() {
       const { data: res } = await this.$http.put(`roles/${this.roleId}`, this.editRolesForm)
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
-      console.log(res.data)
-
       this.getRolesList()
       this.editRolesDialogVisible = false
       this.$message.success('编辑成功')
