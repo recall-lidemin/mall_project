@@ -1,24 +1,64 @@
-# vue_shop
+# 商城后台管理项目
 
-## Project setup
+### 线上预览
+
+- 预览网址：项目全部完成后会部署
+
+
+
+### 技术选型
+
+- [vue.js](<https://cn.vuejs.org/>)  ===>MVVM框架
+- [Vue Router](<https://cn.vuejs.org/>) ===>实现前端路由
+- [Vue CLI](<https://cn.vuejs.org/>)  ===>vue脚手架4.x
+- [axios](<https://github.com/axios/axios>) ===>ajax请求工具
+- [ElementUI](<https://element.eleme.io/>) ===>Vue前端UI框架    
+- [Echarts](<https://echarts.baidu.com/>) ===>数据可视化  
+
+   
+
+### 项目简介
+
+#### 登录模块
+
+- 要点：未成功登录的情况下，不能通过直接改变url而访问到任何页面，此处通过挂载路由导航守卫实现拦截与放行，只有成功登录获取token后，才会放心，否则全部拦截，并转到登录页面
+
+#### 用户管理
+
+- 用户crud
+- 要点：用户分配角色，业务逻辑参照权限管理中
+
+#### 权限管理
+
+- 权限管理业务逻辑：本系统权限模块分为用户、角色、权限，所有权限挂在角色上，然后通过把对应角色分配给相应用户，使得用户获取相应的权限，在其位谋其政。
+- `难点`：
+  - 渲染角色列表，渲染列表展开栏的全部权限选项卡(list型数据，作用域插槽，深层循环嵌套)
+  - 给角色分配权限(tree型数据，作用域插槽，用到递归)
+
+#### 商品管理
+
+
+
+#### 订单管理
+
+
+
+#### 数据统计
+
+
+
+
+
+### 项目启动步骤
+
+- 1、安装依赖
+
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+- 2、运行启动
+
 ```
 npm run serve
 ```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
