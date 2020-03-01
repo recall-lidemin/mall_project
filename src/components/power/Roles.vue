@@ -10,7 +10,7 @@
     <el-card>
         <el-row>
             <el-col>
-                <el-button type="primary">添加角色</el-button>
+                <el-button @click="addRole" type="primary">添加角色</el-button>
             </el-col>
         </el-row>
         <!-- 角色列表区 -->
@@ -39,6 +39,7 @@
                             </el-row>
                         </el-col>
                     </el-row>
+                    <!-- <pre>{{scope.row}}</pre> -->
                 </template>
             </el-table-column>
             <!-- 索引列 -->
@@ -57,23 +58,58 @@
 
     <!-- 分配权限对话框 -->
     <el-dialog
-        title="分配权限"
-        :visible.sync="setRightDialogVisible"
-        width="50%"
-        @close="setRightDialogClosed"
-        >
-        <!-- 树形控件 -->
-        <el-tree ref="treeRef" :default-checked-keys="defKeys" :default-expand-all="true" node-key="id" show-checkbox :data="rightsList" :props="treeProps"></el-tree>
-        <span slot="footer" class="dialog-footer">
-            <el-button @click="setRightDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="allotRights">确 定</el-button>
-        </span>
+      title="分配权限"
+      :visible.sync="setRightDialogVisible"
+      width="50%"
+      @close="setRightDialogClosed"
+      >
+
+      <!-- 树形控件 -->
+      <el-tree
+      ref="treeRef"
+      :default-checked-keys="defKeys"
+      :default-expand-all="true"
+      node-key="id"
+      show-checkbox
+      :data="rightsList"
+      :props="treeProps">
+      </el-tree>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="setRightDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="allotRights">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 添加角色对话框 -->
+    <el-dialog
+      title="添加角色"
+      :visible.sync="addRolesDialogVisible"
+      width="50%"
+      @close="addRolesDialogClosed"
+      ref="addRolesRef"
+      >
+      <!-- 添加角色表单 -->
+      <el-form :model="addRolesForm" :rules="addRolesFormRules" ref="addRolesFormRef">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="addRolesForm.roleName"></el-input>
+        </el-form-item>
+         <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="addRolesForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="addRolesDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveAddRoles">确 定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
+
   data() {
     return {
       // 所有角色列表数据
@@ -86,9 +122,25 @@ export default {
         children: 'children',
         label: 'authName'
       },
+      // tree型默认选中数据
       defKeys: [],
-      //   当前将要分配权限的角色id
-      roleId: ''
+      // 当前将要分配权限的角色id
+      roleId: '',
+      // 添加角色对话框
+      addRolesDialogVisible: false,
+      // 添加角色表单数据
+      addRolesForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      // 添加角色表单校验规则
+      addRolesFormRules: {
+        roleName: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '角色名称在2-10个字符之间', trigger: 'blur' }
+        ],
+        roleDesc: [{ max: 50, message: '角色描述在50个字符之内', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -147,6 +199,23 @@ export default {
       this.$message.success(res.meta.msg)
       this.getRolesList()
       this.setRightDialogVisible = false
+    },
+    // 添加角色
+    addRole() {
+      this.addRolesDialogVisible = true
+    },
+    // 关闭添加角色表单清空表单数据
+    addRolesDialogClosed() {
+      this.$refs.addRolesFormRef.resetFields()
+      this.addRolesForm = {}
+    },
+    // 发起请求保存添加的角色
+    async saveAddRoles() {
+      const { data: res } = await this.$http.post('roles', this.addRolesForm)
+      if (res.meta.status !== 201) return this.$message.error(res.meta.msg)
+      this.$message.success(res.meta.msg)
+      this.getRolesList()
+      this.addRolesDialogVisible = false
     }
   }
 }
