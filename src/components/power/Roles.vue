@@ -48,8 +48,8 @@
             <el-table-column label="角色描述" prop="roleDesc"></el-table-column>
             <el-table-column label="操作" width="300px">
                 <template slot-scope="scope">
-                    <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
-                    <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+                    <el-button @click="editRole(scope.row.id)" type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+                    <el-button @click="delRole(scope.row.id)" type="danger" icon="el-icon-delete" size="mini">删除</el-button>
                     <el-button @click="showSetRightDialog(scope.row)" type="warning" icon="el-icon-setting" size="mini">分配权限</el-button>
                 </template>
             </el-table-column>
@@ -104,6 +104,30 @@
           <el-button type="primary" @click="saveAddRoles">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 编辑角色对话框 -->
+    <el-dialog
+      title="编辑角色"
+      :visible.sync="editRolesDialogVisible"
+      width="50%"
+      @close="editRolesDialogClosed"
+      ref="editRolesRef"
+      >
+      <!-- 编辑角色表单 -->
+      <el-form :model="editRolesForm" :rules="addRolesFormRules" ref="editRolesFormRef">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="editRolesForm.roleName"></el-input>
+        </el-form-item>
+         <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="editRolesForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="editRolesDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="saveEditRoles">保 存</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -140,7 +164,11 @@ export default {
           { min: 2, max: 10, message: '角色名称在2-10个字符之间', trigger: 'blur' }
         ],
         roleDesc: [{ max: 50, message: '角色描述在50个字符之内', trigger: 'blur' }]
-      }
+      },
+      // 编辑角色表单数据
+      editRolesForm: {},
+      // 控制编辑角色对话框显示与隐藏
+      editRolesDialogVisible: false
     }
   },
   created() {
@@ -152,6 +180,7 @@ export default {
       const { data: res } = await this.$http.get('roles')
       if (res.meta.status !== 200) return this.$message.error('获取角色失败')
       this.rolesList = res.data
+      console.log(this.rolesList)
     },
     // 实现展开栏下删除权限
     async removeRightById(role, id) {
@@ -216,6 +245,29 @@ export default {
       this.$message.success(res.meta.msg)
       this.getRolesList()
       this.addRolesDialogVisible = false
+    },
+    // 控制编辑角色对话框显示隐藏
+    async editRole(id) {
+      this.roleId = id
+      const { data: res } = await this.$http.get(`roles/${id}`)
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.editRolesForm = res.data
+      this.editRolesDialogVisible = true
+    },
+    // 关闭编辑对话框清楚表单内容
+    editRolesDialogClosed() {
+      this.$refs.editRolesFormRef.resetFields()
+      this.editRolesForm = {}
+    },
+    // 保存角色编辑
+    async saveEditRoles() {
+      const { data: res } = await this.$http.put(`roles/${this.roleId}`, this.editRolesForm)
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      console.log(res.data)
+
+      this.getRolesList()
+      this.editRolesDialogVisible = false
+      this.$message.success('编辑成功')
     }
   }
 }
