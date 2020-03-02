@@ -1,20 +1,161 @@
 <template>
   <div>
-     <!-- 面包屑导航 -->
+    <!-- 面包屑导航 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>商品管理</el-breadcrumb-item>
-      <el-breadcrumb-item>分类参数</el-breadcrumb-item>
+      <el-breadcrumb-item>参数列表</el-breadcrumb-item>
     </el-breadcrumb>
+
+    <!-- 卡片视图区域 -->
+    <el-card>
+      <!-- 警告区域 -->
+      <el-alert title="注意：只允许为第三级分类设置相关参数" type="warning" :closable="false" show-icon></el-alert>
+
+      <!-- 选择商品分类区域 -->
+      <el-row class="cat_opt">
+        <el-col>
+          <span>选择商品分类：</span>
+          <!-- 选择商品分类级联选择框 -->
+          <el-cascader v-model="selectedKeys" :options="cateList" :props="cateProps"
+            @change="handleChange" clearable>
+          </el-cascader>
+        </el-col>
+      </el-row>
+
+      <!-- tab 页签区域 -->
+      <el-tabs v-model="activeName" @tab-click="handleClick">
+        <!-- 添加动态参数的面板 -->
+        <el-tab-pane label="动态参数" name="many">
+          <el-button type="primary" size="mini" :disabled="isBtnDisabled">添加参数</el-button>
+
+          <!-- 动态参数数据表格 -->
+          <el-table :data="manyTableData" border stripe>
+            <!-- 展开行 -->
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="参数名称" prop="attr_name"></el-table-column>
+            <el-table-column label="操作">
+              <template>
+                <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+                <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <!-- 添加静态属性的面板 -->
+        <el-tab-pane label="静态属性" name="only">
+          <el-button type="primary" size="mini" :disabled="isBtnDisabled">添加属性</el-button>
+
+          <!-- 静态属性面板 -->
+          <el-table :data="onlyTableData" border stripe>
+            <!-- 展开行 -->
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index"></el-table-column>
+            <el-table-column label="属性名称" prop="attr_name"></el-table-column>
+            <el-table-column label="操作">
+              <template>
+                <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+                <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+    </el-card>
   </div>
 </template>
 
 <script>
 export default {
-
+  data() {
+    return {
+      // 商品分类列表
+      cateList: [],
+      // 配置级联选择框
+      cateProps: {
+        expandTrigger: 'hover',
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children'
+      },
+      // 级联选中项的id数组
+      selectedKeys: [],
+      // 被激活的页签名称
+      activeName: 'many',
+      // 动态参数数据
+      manyTableData: [],
+      // 静态参数数据
+      onlyTableData: []
+    }
+  },
+  methods: {
+    async getCateList() {
+      const { data: res } = await this.$http.get('categories')
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.cateList = res.data
+    },
+    // 级联选择项改变触发
+    handleChange() {
+      this.getParamsData()
+    },
+    // tab页签点击事件处理函数
+    handleClick() {
+      this.getParamsData()
+    },
+    async getParamsData() {
+      // 如果选中的不是三级分类，直接返回
+      if (this.selectedKeys.length !== 3) {
+        this.selectedKeys = []
+        return
+      }
+      // 根据所选分类的id和当前所处的面板获取对应的分类参数
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes`,
+        {
+          params: { sel: this.activeName }
+        }
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取参数列表失败')
+      }
+      console.log(res.data)
+      if (this.activeName === 'many') {
+        this.manyTableData = res.data
+      } else {
+        this.onlyTableData = res.data
+      }
+    }
+  },
+  created() {
+    // 获取所有商品分类列表
+    this.getCateList()
+  },
+  // 计算属性
+  computed: {
+    // 控制按钮是否禁用
+    isBtnDisabled() {
+      if (this.selectedKeys.length !== 3) {
+        return true
+      }
+      return false
+    },
+    // 获取级联选择器选中的第三级分类的id
+    cateId() {
+      if (this.selectedKeys.length === 3) {
+        return this.selectedKeys[2]
+      }
+      return null
+    }
+  }
 }
 </script>
 
 <style>
-
+.cat_opt {
+  margin-top: 15px;
+}
+.el-tabs {
+  margin-top: 15px;
+}
 </style>

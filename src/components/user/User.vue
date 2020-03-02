@@ -12,12 +12,8 @@
       <!-- 搜索与添加区域 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input
-            clearable
-            @clear="getUserList"
-            placeholder="请输入内容"
-            v-model.trim="queryInfo.query"
-          >
+          <el-input clearable @clear="getUserList" placeholder="请输入内容"
+            v-model.trim="queryInfo.query">
             <el-button @click="getUserList" slot="append" icon="el-icon-search"></el-button>
           </el-input>
         </el-col>
@@ -37,50 +33,34 @@
           <!-- 作用域插槽 -->
           <template slot-scope="scope">
             <!-- scope.row 获取当前行的数据 -->
-            <el-switch v-model="scope.row.mg_state" @change="userStateChange(scope.row)"></el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="userStateChange(scope.row)">
+            </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
             <!-- scope.row 获取当前行的数据 -->
             <!-- 修改 -->
-            <el-button
-              @click="editUser(scope.row.id)"
-              type="primary"
-              icon="el-icon-edit"
-              size="mini"
-            ></el-button>
+            <el-button @click="editUser(scope.row.id)" type="primary" icon="el-icon-edit"
+              size="mini"></el-button>
             <!-- 删除 -->
-            <el-button
-              @click="delUser(scope.row.id)"
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-            ></el-button>
+            <el-button @click="delUser(scope.row.id)" type="danger" icon="el-icon-delete"
+              size="mini"></el-button>
             <!-- 分配角色 -->
-            <el-tooltip
-              :enterable="false"
-              class="item"
-              effect="dark"
-              content="分配角色"
-              placement="top"
-            >
-              <el-button @click="showAllotRoleDialog(scope.row)" type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-tooltip :enterable="false" class="item" effect="dark" content="分配角色"
+              placement="top">
+              <el-button @click="showAllotRoleDialog(scope.row)" type="warning"
+                icon="el-icon-setting" size="mini"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
 
       <!-- 分页区 -->
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[5,10, 20, 30, 40,50,100]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      ></el-pagination>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum" :page-sizes="[5,10, 20, 30, 40,50,100]"
+        :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper"
+        :total="total"></el-pagination>
     </el-card>
 
     <!-- 添加用户对话框 -->
@@ -108,7 +88,8 @@
     </el-dialog>
 
     <!-- 编辑用户对话框  -->
-    <el-dialog @close="editDialogClosed" title="修改用户信息" :visible.sync="editDialogVisible" width="50%">
+    <el-dialog @close="editDialogClosed" title="修改用户信息" :visible.sync="editDialogVisible"
+      width="50%">
       <!-- 主体内容区 -->
       <el-form :model="editForm" :rules="addFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名" prop="username">
@@ -129,16 +110,14 @@
     </el-dialog>
 
     <!-- 添加分配角色对话框 -->
-    <el-dialog @close="allotRoleDialogClosed" title="分配角色" :visible.sync="allotRoleDialogVisible" width="50%">
+    <el-dialog @close="allotRoleDialogClosed" title="分配角色" :visible.sync="allotRoleDialogVisible"
+      width="50%">
       <!-- 主体内容区 -->
       <p>当前用户：{{ userinfo.username }}</p>
       <p>当前角色：{{ userinfo.role_name }}</p>
       <p>分配角色：
         <el-select v-model="selectedRoleId" placeholder="请选择角色">
-          <el-option
-            v-for="item in rolesList"
-            :key="item.id"
-            :label="item.roleName"
+          <el-option v-for="item in rolesList" :key="item.id" :label="item.roleName"
             :value="item.id">
           </el-option>
         </el-select>
@@ -342,8 +321,15 @@ export default {
     // 保存分配角色
     async saveAllotDialog() {
       if (!this.selectedRoleId) return this.$message.error('请选择用户角色')
-      const { data: res } = await this.$http.put(`users/${this.userinfo.id}/role`, { rid: this.selectedRoleId })
-      if (res.meta.status !== 200) return this.$message.error('更新用户角色失败')
+      const { data: res } = await this.$http.put(
+        `users/${this.userinfo.id}/role`,
+        {
+          rid: this.selectedRoleId
+        }
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error('更新用户角色失败')
+      }
       this.$message.success('更新用户角色成功')
       this.getUserList()
       this.allotRoleDialogVisible = false

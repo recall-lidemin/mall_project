@@ -15,10 +15,12 @@
       </el-row>
 
       <!-- 商品分类表格 -->
-      <tree-table class="treetable" border index-text='' show-index :expand-type="false" :selection-type="false" :data="cateList" :columns="columns">
+      <tree-table :show-row-hover="false" class="treetable" border index-text='' show-index
+        :expand-type="false" :selection-type="false" :data="cateList" :columns="columns">
         <!-- 是否有效列 -->
         <template slot="isok" slot-scope="scope">
-          <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color:lightgreen"></i>
+          <i class="el-icon-success" v-if="scope.row.cat_deleted === false"
+            style="color:lightgreen"></i>
           <i class="el-icon-error" v-else style="color:red"></i>
         </template>
         <!-- 排序列 -->
@@ -35,37 +37,26 @@
       </tree-table>
 
       <!-- 分页区域 -->
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[5,10, 15, 20]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-      ></el-pagination>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page="queryInfo.pagenum" :page-sizes="[5,10, 15, 20]"
+        :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper"
+        :total="total"></el-pagination>
     </el-card>
 
     <!-- 添加分类对话框 -->
-    <el-dialog
-      title="添加分类"
-      :visible.sync="addCatedialogVisible"
-      width="50%"
-      @close="addCatedialogClosed"
-      >
+    <el-dialog title="添加分类" :visible.sync="addCatedialogVisible" width="50%"
+      @close="addCatedialogClosed">
       <!-- 添加分类表单 -->
-      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px">
+      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef"
+        label-width="100px">
         <el-form-item label="分类名称:" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
         <el-form-item label="父级分类:">
           <!-- options指定数据源
           props指定配置对象 -->
-          <el-cascader
-              v-model="selectedKeys"
-              :options="parentCateList"
-              :props="cascaderProps"
-              @change="parentCateChange" clearable ref="cascaderAddCateRef">
+          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps"
+            @change="parentCateChange" clearable ref="cascaderAddCateRef">
           </el-cascader>
         </el-form-item>
       </el-form>
@@ -129,7 +120,9 @@ export default {
       },
       // 添加分类表单验证规则
       addCateFormRules: {
-        cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+        cat_name: [
+          { required: true, message: '请输入分类名称', trigger: 'blur' }
+        ]
       },
       // 父级分类数据列表
       parentCateList: [],
@@ -150,7 +143,9 @@ export default {
   methods: {
     // 获取商品分类数据
     async getCateList() {
-      const { data: res } = await this.$http.get('categories', { params: this.queryInfo })
+      const { data: res } = await this.$http.get('categories', {
+        params: this.queryInfo
+      })
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       // 拿到数据列表
       this.cateList = res.data.result
@@ -174,7 +169,9 @@ export default {
     },
     //
     async getParentCateList() {
-      const { data: res } = await this.$http.get('categories', { params: { type: 2 } })
+      const { data: res } = await this.$http.get('categories', {
+        params: { type: 2 }
+      })
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.parentCateList = res.data
       console.log(this.parentCateList)
@@ -184,7 +181,9 @@ export default {
       // 处理添加分类的表单数据
       if (this.selectedKeys.length > 0) {
         // 父级分类的id
-        this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        this.addCateForm.cat_pid = this.selectedKeys[
+          this.selectedKeys.length - 1
+        ]
         // 为当前分类的等级赋值
         this.addCateForm.cat_level = this.selectedKeys.length
       } else {
@@ -204,7 +203,10 @@ export default {
       console.log(this.selectedKeys)
       this.$refs.addCateFormRef.validate(async valid => {
         if (!valid) return
-        const { data: res } = await this.$http.post('categories', this.addCateForm)
+        const { data: res } = await this.$http.post(
+          'categories',
+          this.addCateForm
+        )
         if (res.meta.status !== 201) return this.$message.error(res.meta.msg)
         this.$message.success(res.meta.msg)
         this.getCateList()
@@ -216,10 +218,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.treetable{
+.treetable {
   margin-top: 15px;
 }
-.el-cascader{
+.el-cascader {
   width: 100%;
 }
 </style>

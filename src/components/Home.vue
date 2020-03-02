@@ -14,16 +14,9 @@
       <el-aside :width="isCollapse ? '64px' : '200px' ">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 侧边栏菜单区 -->
-        <el-menu
-          :collapse="isCollapse"
-          :collapse-transition="false"
-          unique-opened
-          router
-          background-color="#333744"
-          text-color="#fff"
-          active-text-color="#409EFF"
-          :default-active="activePath"
-        >
+        <el-menu :collapse="isCollapse" :collapse-transition="false" unique-opened router
+          background-color="#333744" text-color="#fff" active-text-color="#409EFF"
+          :default-active="activePath">
           <!-- 一级菜单 -->
           <el-submenu v-for="item in menulist" :key="item.id" :index="item.id+''">
             <!-- 一级菜单得模板区 -->
@@ -35,12 +28,8 @@
             </template>
 
             <!-- 二级菜单 -->
-            <el-menu-item
-              @click="saveNavstate('/' + subitem.path)"
-              :index=" '/' + subitem.path "
-              v-for="subitem in item.children"
-              :key="subitem.id"
-            >
+            <el-menu-item @click="saveNavstate('/' + subitem.path)" :index=" '/' + subitem.path "
+              v-for="subitem in item.children" :key="subitem.id">
               <!-- 二级菜单得模板区 -->
               <template slot="title">
                 <!-- 二级图标 -->
