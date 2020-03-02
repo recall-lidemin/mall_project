@@ -2,7 +2,7 @@
 
 ### 线上预览
 
-- 预览网址：http://www.hudingjie.com (前瞻版，还有一半功能未完成)
+- 预览网址：http://www.hudingjie.com (PC端前瞻版，还有部分功能未完成)
 
 
 
