@@ -42,7 +42,9 @@
                   size="mini">
                   编辑
                 </el-button>
-                <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+                <el-button @click="delParams(scope.row.attr_id)" type="danger" icon="el-icon-delete"
+                  size="mini">删除
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -64,7 +66,9 @@
                 <el-button @click="showEditDialog(scope.row)" type="primary" icon="el-icon-edit"
                   size="mini">编辑
                 </el-button>
-                <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+                <el-button @click="delParams(scope.row.attr_id)" type="danger" icon="el-icon-delete"
+                  size="mini">删除
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -217,8 +221,18 @@ export default {
       this.addForm = {}
     },
     // 展示编辑对话框
-    showEditDialog(info) {
-      this.$http.get(`categories/${info.cat_id}/attributes/${info.attr_id}`)
+    async showEditDialog(info) {
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes/${info.attr_id}`,
+        {
+          params: { attr_sel: this.activeName }
+        }
+      )
+
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取信息失败')
+      }
+      this.editForm = res.data
       this.editDialogVisible = true
     },
     // 监听编辑对话框关闭
@@ -227,7 +241,49 @@ export default {
       this.editForm = {}
     },
     // 提交编辑
-    editParams() {}
+    editParams() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.put(
+          `categories/${this.cateId}/attributes/${this.editForm.attr_id}`,
+          {
+            attr_name: this.editForm.attr_name,
+            attr_sel: this.activeName
+          }
+        )
+        if (res.meta.status !== 200) {
+          return this.$message.error('修改参数失败')
+        }
+        this.$message.success('修改成功')
+        this.getParamsData()
+        this.editDialogVisible = false
+      })
+    },
+    // 删除
+    async delParams(id) {
+      const confirmResult = await this.$confirm(
+        '此操作将永久删除该文件, 是否继续?',
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch(err => err)
+      // 取消删除
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('删除已取消')
+      }
+      // 删除
+      const { data: res } = await this.$http.delete(
+        `categories/${this.cateId}/attributes/${id}`
+      )
+      if (res.meta.status !== 200) {
+        return this.$message.error('删除失败')
+      }
+      this.getParamsData()
+      this.$message.success('删除成功')
+    }
   },
   created() {
     // 获取所有商品分类列表
