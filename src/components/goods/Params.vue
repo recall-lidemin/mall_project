@@ -147,9 +147,7 @@ export default {
         attr_name: [{ required: true, message: '请输入参数', trigger: 'blur' }]
       },
       // 控制编辑对话框的展示与隐藏
-      editDialogVisible: false,
-      // 属性 ID
-      attr_id: ''
+      editDialogVisible: false
     }
   },
   methods: {
@@ -183,7 +181,6 @@ export default {
       if (res.meta.status !== 200) {
         return this.$message.error('获取参数列表失败')
       }
-      console.log(res.data)
       if (this.activeName === 'many') {
         this.manyTableData = res.data
       } else {
