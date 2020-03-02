@@ -27,7 +27,8 @@
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <!-- 添加动态参数的面板 -->
         <el-tab-pane label="动态参数" name="many">
-          <el-button type="primary" size="mini" :disabled="isBtnDisabled">添加参数</el-button>
+          <el-button type="primary" size="mini" :disabled="isBtnDisabled" @click="addParams">添加参数
+          </el-button>
 
           <!-- 动态参数数据表格 -->
           <el-table :data="manyTableData" border stripe>
@@ -36,16 +37,21 @@
             <el-table-column type="index"></el-table-column>
             <el-table-column label="参数名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
-              <template>
-                <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+              <template slot-scope="scope">
+                <el-button @click="showEditDialog(scope.row)" type="primary" icon="el-icon-edit"
+                  size="mini">
+                  编辑
+                </el-button>
                 <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
         </el-tab-pane>
+
         <!-- 添加静态属性的面板 -->
         <el-tab-pane label="静态属性" name="only">
-          <el-button type="primary" size="mini" :disabled="isBtnDisabled">添加属性</el-button>
+          <el-button type="primary" size="mini" :disabled="isBtnDisabled" @click="addAttribute">添加属性
+          </el-button>
 
           <!-- 静态属性面板 -->
           <el-table :data="onlyTableData" border stripe>
@@ -54,8 +60,10 @@
             <el-table-column type="index"></el-table-column>
             <el-table-column label="属性名称" prop="attr_name"></el-table-column>
             <el-table-column label="操作">
-              <template>
-                <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+              <template slot-scope="scope">
+                <el-button @click="showEditDialog(scope.row)" type="primary" icon="el-icon-edit"
+                  size="mini">编辑
+                </el-button>
                 <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
               </template>
             </el-table-column>
@@ -63,6 +71,38 @@
         </el-tab-pane>
       </el-tabs>
     </el-card>
+
+    <!-- 添加参数\添加属性对话框 -->
+    <el-dialog @close="addDialogClosed" :title="'添加'+addDialogTitle"
+      :visible.sync="addDialogVisible" width="50%">
+      <!-- 添加表单 -->
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px"
+        class="demo-ruleForm">
+        <el-form-item :label="addDialogTitle" prop="attr_name">
+          <el-input v-model="addForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveParams">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <!-- 编辑参数\编辑属性对话框 -->
+    <el-dialog @close="editDialogClosed" :title="'编辑'+addDialogTitle"
+      :visible.sync="editDialogVisible" width="50%">
+      <!-- 添加表单 -->
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px"
+        class="demo-ruleForm">
+        <el-form-item :label="addDialogTitle" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editParams">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -86,7 +126,26 @@ export default {
       // 动态参数数据
       manyTableData: [],
       // 静态参数数据
-      onlyTableData: []
+      onlyTableData: [],
+      // 控制添加对话框显示与隐藏
+      addDialogVisible: false,
+      // 添加参数的表单对象
+      addForm: {
+        attr_name: ''
+      },
+      // 编辑表单
+      editForm: {},
+      // 添加参数表单校验规则
+      addFormRules: {
+        attr_name: [{ required: true, message: '请输入参数', trigger: 'blur' }]
+      },
+      editFormRules: {
+        attr_name: [{ required: true, message: '请输入参数', trigger: 'blur' }]
+      },
+      // 控制编辑对话框的展示与隐藏
+      editDialogVisible: false,
+      // 属性 ID
+      attr_id: ''
     }
   },
   methods: {
@@ -103,6 +162,7 @@ export default {
     handleClick() {
       this.getParamsData()
     },
+    // 封装获取全部分类参数数据方法
     async getParamsData() {
       // 如果选中的不是三级分类，直接返回
       if (this.selectedKeys.length !== 3) {
@@ -125,7 +185,49 @@ export default {
       } else {
         this.onlyTableData = res.data
       }
-    }
+    },
+    // 监听添加参数按钮事件
+    addParams() {
+      this.addDialogVisible = true
+    },
+    // 监听添加属性按钮事件
+    addAttribute() {
+      this.addDialogVisible = true
+    },
+    // 监听添加对话框确定按钮事件
+    saveParams() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return
+        const { data: res } = await this.$http.post(
+          `categories/${this.cateId}/attributes`,
+          {
+            attr_name: this.addForm.attr_name,
+            attr_sel: this.activeName
+          }
+        )
+        if (res.meta.status !== 201) return this.$message.error('添加失败')
+        this.$message.success('添加成功')
+        this.getParamsData()
+        this.addDialogVisible = false
+      })
+    },
+    // 监听添加对话框关闭事件
+    addDialogClosed() {
+      this.$refs.addFormRef.resetFields()
+      this.addForm = {}
+    },
+    // 展示编辑对话框
+    showEditDialog(info) {
+      this.$http.get(`categories/${info.cat_id}/attributes/${info.attr_id}`)
+      this.editDialogVisible = true
+    },
+    // 监听编辑对话框关闭
+    editDialogClosed() {
+      this.$refs.editFormRef.resetFields()
+      this.editForm = {}
+    },
+    // 提交编辑
+    editParams() {}
   },
   created() {
     // 获取所有商品分类列表
@@ -146,6 +248,13 @@ export default {
         return this.selectedKeys[2]
       }
       return null
+    },
+    // 获取对应的添加对话框的标题显示
+    addDialogTitle() {
+      if (this.activeName === 'many') {
+        return '动态参数'
+      }
+      return '静态属性'
     }
   }
 }
