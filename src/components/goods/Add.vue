@@ -47,16 +47,45 @@
             <el-form-item :key="item.attr_id" v-for="item in manyTableData" :label="item.attr_name">
               <!-- 复选框组 -->
               <el-checkbox-group v-model="item.attr_vals">
-                <el-checkbox :label="cb" :key="i" v-for="(cb,i) in item.attr_vals" border></el-checkbox>
+                <el-checkbox :label="cb" :key="i" v-for="(cb,i) in item.attr_vals" border>
+                </el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
-          <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+          <el-tab-pane label="商品属性" name="2">
+            <el-form-item :label="item.attr_name" :key="item.attr_id" v-for="item in onlyTableData">
+              <el-input v-model="item.attr_vals"></el-input>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <!-- 图片上传
+            action图片上传的地址
+            on-preview预览
+            handleRemove：图片移除事件
+            -->
+
+            <el-upload :action="uploadUrl"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              list-type="picture"
+              :headers="headerObj"
+              :on-success="handleSuccess">
+              <el-button size="small" type="primary">点击上传</el-button>
+            </el-upload>
+
+          </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
+    <!-- 图片预览 -->
+    <el-dialog
+  title="图片预览"
+  :visible.sync="previewDialogVisible"
+  width="50%"
+  >
+  <img :src="previewPath" alt="" class="previewImg">
+</el-dialog>
   </div>
 </template>
 
@@ -72,7 +101,9 @@ export default {
         goods_price: 0,
         goods_weight: 0,
         goods_number: 0,
-        goods_cat: []
+        goods_cat: [],
+        // 图片数组
+        pics: []
       },
       // 添加商品表单校验规则
       addFormRules: {
@@ -103,7 +134,15 @@ export default {
         checkStrictly: false
       },
       // 动态参数列表
-      manyTableData: []
+      manyTableData: [],
+      // 静态属性列表数据
+      onlyTableData: [],
+      // upload
+      uploadUrl: 'http://www.lideminrecall.com/api/upload',
+      // 图片上传组件的headers
+      headerObj: { Authorization: window.sessionStorage.getItem('token') },
+      previewPath: '',
+      previewDialogVisible: false
     }
   },
   created() {
@@ -149,7 +188,39 @@ export default {
         })
         this.manyTableData = res.data
         console.log(this.manyTableData)
+      } else if (this.activeIndex === '2') {
+        const { data: res } = await this.$http.get(
+          `categories/${this.cateId}/attributes`,
+          {
+            params: { sel: 'only' }
+          }
+        )
+
+        if (res.meta.status !== 200) {
+          return this.$message.error('获取静态属性失败')
+        }
+
+        console.log(res.data)
+        this.onlyTableData = res.data
       }
+    },
+    // 处理图片预览事件
+    handlePreview(file) {
+      console.log(file)
+
+      this.previewDialogVisible = true
+      this.previewPath = file.url
+    },
+    // 处理移除图片的操作
+    handleRemove(file) {
+      const filePath = file.response.data.tmp_path
+      const i = this.addForm.pics.findIndex(x => x.pic === filePath)
+      this.addForm.pics.splice(i, 1)
+    },
+    // 监听图片上传成功的事件
+    handleSuccess(response) {
+      const picInfo = { pic: response.data.tmp_path }
+      this.addForm.pics.push(picInfo)
     }
   },
   computed: {
@@ -165,4 +236,10 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-checkbox {
+  margin: 0 10px 0 0 !important;
+}
+.previewImg{
+  width: 100%;
+}
 </style>
