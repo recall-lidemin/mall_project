@@ -23,3 +23,8 @@ body,
 .el-steps{
     margin: 15px 0;
 }
+
+.quill-editor,
+.ql-editor{
+    min-height: 300px;
+}

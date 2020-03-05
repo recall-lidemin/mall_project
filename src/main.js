@@ -2,6 +2,13 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import TreeTable from 'vue-table-with-tree-grid'
+// 导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+// 导入富文本编辑器对应样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 import './plugins/element.js'
 import './assets/css/global.css'
 
@@ -32,7 +39,11 @@ Vue.filter('dateFormat', (originVal) => {
 
   return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
 })
+
 Vue.component('tree-table', TreeTable)
+
+// 注册全局富文本编辑器
+Vue.use(VueQuillEditor /* { default global options } */)
 
 Vue.config.productionTip = false
 
