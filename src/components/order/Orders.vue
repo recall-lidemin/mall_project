@@ -20,7 +20,7 @@
       <el-table :data="orderList" border stripe row-key="id">
         <el-table-column type="index"></el-table-column>
         <el-table-column label="订单编号" prop="order_number"></el-table-column>
-        <el-table-column label="订单价格" prop="order_price"></el-table-column>
+        <el-table-column label="订单价格" prop="order_price" width="120px"></el-table-column>
         <el-table-column label="是否付款" prop="pay_status">
           <template slot-scope="scope">
             <el-tag type="danger" v-if="scope.row.pay_status">未付款</el-tag>
@@ -33,10 +33,11 @@
             {{ scope.row.create_time | dateFormat }}
           </template>
         </el-table-column>
-        <el-table-column label="操作">
-          <template>
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showBox"></el-button>
-            <el-button type="success" icon="el-icon-location" size="mini" @click="showProgress">
+        <el-table-column label="操作" width="300px">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="showBox(scope.row)">编辑
+            </el-button>
+            <el-button type="success" icon="el-icon-location" size="mini" @click="showProgress">查看物流
             </el-button>
           </template>
         </el-table-column>
@@ -164,7 +165,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 .el-cascader {
   width: 100%;
 }
