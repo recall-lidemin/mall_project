@@ -1,3 +1,9 @@
+const prodPlugins = []
+// 获取编译模式
+if (process.env.NODE_ENV === 'production') {
+  prodPlugins.push('transform-remove-console')
+}
+
 module.exports = {
   presets: [
     '@vue/cli-plugin-babel/preset'
@@ -10,6 +16,7 @@ module.exports = {
         styleLibraryName: 'theme-chalk'
       }
     ],
-    'transform-remove-console'
+    ...prodPlugins,
+    '@babel/plugin-syntax-dynamic-import'
   ]
 }
