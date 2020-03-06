@@ -17,13 +17,27 @@ import './assets/fonts/iconfont.css'
 
 // 导入挂在axios
 import axios from 'axios'
+
+// 请求进度条展示
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 // 配置请求得根路径
 axios.defaults.baseURL = 'http://www.lideminrecall.com/api/'
 // 请求拦截，为请求得headers添加Authorization属性
 axios.interceptors.request.use(config => {
+  // 发起请求展示进度条
+  NProgress.start()
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config
 })
+
+axios.interceptors.response.use(config => {
+  // 响应结束进度条
+  NProgress.done()
+  return config
+})
+
 Vue.prototype.$http = axios
 
 // 定义过滤器处理时间
