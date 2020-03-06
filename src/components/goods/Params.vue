@@ -31,7 +31,7 @@
           </el-button>
 
           <!-- 动态参数数据表格 -->
-          <el-table :data="manyTableData" border stripe>
+          <el-table :data="manyTableData" border stripe row-key="id">
             <!-- 展开行 -->
             <el-table-column type="expand">
               <template slot-scope="scope">

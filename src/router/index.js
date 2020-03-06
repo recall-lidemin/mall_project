@@ -1,19 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import Home from '../components/Home.vue'
-// import Welcome from '../components/Welcome.vue'
-// import User from '../components/user/User.vue'
-// import Rights from '../components/power/Rights.vue'
-// import Roles from '../components/power/Roles.vue'
-
-// import Categories from '../components/goods/Categories.vue'
-// import Params from '../components/goods/Params.vue'
-
-// import Goods from '../components/goods/Goods.vue'
-// import Orders from '../components/order/Orders.vue'
-
-// import Reports from '../components/reports/Reports.vue'
-// import Add from '../components/goods/Add.vue'
 
 const Login = () => import(/* webpackChunkName: "login_home_welcome" */'../components/Login.vue')
 const Home = () => import(/* webpackChunkName: "login_home_welcome" */'../components/Home.vue')
