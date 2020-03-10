@@ -1,5 +1,8 @@
 <template>
   <div class="login_container">
+    <div class="sky" v>
+      <div class="star"></div>
+    </div>
     <div class="login_box">
       <!-- 头像区 -->
       <div class="avatar_box">
@@ -51,6 +54,9 @@ export default {
       }
     }
   },
+  mounted() {
+    this.sky()
+  },
   methods: {
     resetLoginForm() {
       this.$refs.loginFormRef.resetFields()
@@ -69,6 +75,33 @@ export default {
         // 2.通过编程式导航跳转到后台，路由地址是 /home
         this.$router.push('/home')
       })
+    },
+    sky() {
+      for (var i = 0; i < 800; i++) {
+        const star = document.createElement('div')
+        star.classList.add('star')
+        document.querySelector('.sky').append(star)
+      }
+
+      document.querySelectorAll('.star').forEach(item => {
+        console.log(item)
+
+        var s = 0.2 + Math.random() * 1
+        var curR = 800 + Math.random() * 300
+        item.style.transformOrigin = '0 0 ' + curR + 'px'
+        item.style.transform =
+          ' translate3d(0,0,-' +
+          curR +
+          'px) rotateY(' +
+          Math.random() * 360 +
+          'deg) rotateX(' +
+          Math.random() * -50 +
+          'deg) scale(' +
+          s +
+          ',' +
+          s +
+          ')'
+      })
     }
   }
 }
@@ -76,14 +109,61 @@ export default {
 
 <style lang="less">
 .login_container {
+  position: relative;
   height: 100%;
-  background-color: #2b4b6b;
+  overflow: hidden;
+  background: radial-gradient(
+    200% 102% at bottom center,
+    #f7f7b6,
+    #e96f92,
+    #75517d,
+    #1b2947
+  );
+  background: radial-gradient(
+    220% 100% at top center,
+    #1b2947 10%,
+    #75517d 40%,
+    #e96f92 65%,
+    #f7f7b6
+  );
+
+  .sky {
+    transform: perspective(500px);
+    transform-style: preserve-3d;
+    position: absolute;
+    bottom: 0;
+    perspective-origin: 50% 100%;
+    left: 50%;
+    animation: rotate 90s infinite linear;
+  }
+
+  .star {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 4px;
+    border-radius: 3px 2px 3px 4px;
+    background-color: #fff;
+    transform-origin: 0 0 -300px;
+    transform: translate3d(0, 0, -300px);
+
+  }
+  @keyframes rotate {
+    0% {
+      transform: perspective(400px) rotateZ(20deg) rotateX(-40deg) rotateY(0);
+    }
+    100% {
+      transform: perspective(500px) rotateZ(20deg) rotateX(-40deg)
+        rotateY(-360deg);
+    }
+  }
 }
 
 .login_box {
   width: 450px;
   height: 300px;
-  background-color: #fff;
+  background-color: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
   position: absolute;
   top: 50%;
