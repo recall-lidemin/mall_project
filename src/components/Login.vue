@@ -82,10 +82,7 @@ export default {
         star.classList.add('star')
         document.querySelector('.sky').append(star)
       }
-
       document.querySelectorAll('.star').forEach(item => {
-        console.log(item)
-
         var s = 0.2 + Math.random() * 1
         var curR = 800 + Math.random() * 300
         item.style.transformOrigin = '0 0 ' + curR + 'px'

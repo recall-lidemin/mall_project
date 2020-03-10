@@ -17,6 +17,10 @@
         <el-menu :collapse="isCollapse" :collapse-transition="false" unique-opened router
           background-color="#333744" text-color="#fff" active-text-color="#409EFF"
           :default-active="activePath">
+          <el-menu-item index="/welcome" class="home">
+          <i class="el-icon-s-home"></i>
+            <span>首页</span>
+          </el-menu-item>
           <!-- 一级菜单 -->
           <el-submenu v-for="item in menulist" :key="item.id" :index="item.id+''">
             <!-- 一级菜单得模板区 -->
@@ -135,4 +139,5 @@ export default {
   letter-spacing: 0.2em;
   cursor: pointer;
 }
+
 </style>
