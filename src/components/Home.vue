@@ -18,7 +18,7 @@
           background-color="#333744" text-color="#fff" active-text-color="#409EFF"
           :default-active="activePath">
           <el-menu-item index="/welcome" class="home">
-          <i class="el-icon-s-home"></i>
+            <i class="el-icon-s-home"></i>
             <span>首页</span>
           </el-menu-item>
           <!-- 一级菜单 -->
@@ -103,12 +103,14 @@ export default {
 }
 
 .el-header {
-  background-color: #373d41;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: #fff;
   font-size: 20px;
+  // background: url('../assets/img/logo.png');
+  background-size: cover;
+  background-color: #373d41;
   > div {
     display: flex;
     align-items: center;
@@ -124,6 +126,8 @@ export default {
 
 .el-main {
   background-color: #eaedf1;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 .iconfont {
@@ -139,5 +143,4 @@ export default {
   letter-spacing: 0.2em;
   cursor: pointer;
 }
-
 </style>
