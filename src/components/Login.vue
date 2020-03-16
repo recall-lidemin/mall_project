@@ -134,6 +134,15 @@ export default {
     animation: rotate 90s infinite linear;
   }
 
+  @keyframes show {
+    0% {
+      transform: scale(0) rotate(0) ;
+    }
+    100% {
+      transform: scale(1) rotateX(360deg) translate(-50%, -50%);;
+    }
+  }
+
   .star {
     position: absolute;
     top: 0;
@@ -166,6 +175,7 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  animation: show 2s;
 
   .avatar_box {
     width: 130px;
